@@ -1,17 +1,12 @@
 from sqlalchemy.orm import Session
 from app import models
+from app.core.config import settings
 from app.core.security import get_password_hash
-from app.db.session import SessionLocal
 
-def init_db() -> None:
-    db = SessionLocal()
-    try:
-        create_initial_admin(db)
-    finally:
-        db.close()
+def init_db(db: Session) -> None:
+    create_initial_admin(db)
 
 def create_initial_admin(db: Session) -> None:
-    from app.core.config import settings  # Import settings here to avoid circular import
     admin_user = db.query(models.user_model.User).filter(models.user_model.User.username == settings.ADMIN_USERNAME).first()
     if not admin_user:
         admin_user = models.user_model.User(
