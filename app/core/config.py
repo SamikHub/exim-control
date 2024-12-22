@@ -4,11 +4,9 @@ from jose import JWTError, jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from app.core.config import settings
-from app.db.session import get_db
-from app.schemas.user_schema import TokenData, UserOut
 from passlib.context import CryptContext
 from app.utils.user_utils import get_user_by_username
+from app.db.session import get_db
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -20,6 +18,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    from app.core.config import settings  # Імпортуйте settings тут, щоб уникнути циклічного імпорту
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -30,6 +29,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    from app.core.config import settings  # Імпортуйте settings тут, щоб уникнути циклічного імпорту
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",

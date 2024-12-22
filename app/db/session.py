@@ -1,10 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from app.core.config import settings  # Зробимо імпорт на глобальному рівні
 
 # Налаштування бази даних
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@db/{settings.POSTGRES_DB}"
+def get_database_url():
+    from app.core.config import settings  # Імпортуйте settings тут, щоб уникнути циклічного імпорту
+    return f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@db/{settings.POSTGRES_DB}"
+
+SQLALCHEMY_DATABASE_URL = get_database_url()
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # Створення SessionLocal та Base
